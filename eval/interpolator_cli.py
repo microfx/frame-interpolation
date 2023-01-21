@@ -169,8 +169,7 @@ class ProcessDirectory(beam.DoFn):
         for ext in _INPUT_EXT
     ]
     print(input_frames_list)
-    if not input_frames_list or not all(input_frames_list):
-        raise ValueError(f'No files found at directory {directory}')
+
     # Append the first frame of the first list to the end of the input_frames_list
     if input_frames_list[0]:
       input_frames_list[0].append(input_frames_list[0][0])
