@@ -163,11 +163,15 @@ class ProcessDirectory(beam.DoFn):
       ffmpeg_path = util.get_ffmpeg_path()
       media.set_ffmpeg(ffmpeg_path)
 
-  def process(self, directory: str):
+      
+   def process(self, directory: str):
     input_frames_list = [
         natsort.natsorted(tf.io.gfile.glob(f'{directory}/*.{ext}'))
         for ext in _INPUT_EXT
     ]
+
+    # Append the first frame of the first list to the end of the input_frames_list
+    input_frames_list[0].append(input_frames_list[0][0])
     input_frames = functools.reduce(lambda x, y: x + y, input_frames_list)
     logging.info('Generating in-between frames for %s.', directory)
     frames = list(
