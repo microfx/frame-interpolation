@@ -162,9 +162,8 @@ class ProcessDirectory(beam.DoFn):
     if _OUTPUT_VIDEO.value:
       ffmpeg_path = util.get_ffmpeg_path()
       media.set_ffmpeg(ffmpeg_path)
-
-      
-   def process(self, directory: str):
+  
+  def process(self, directory: str):
     input_frames_list = [
         natsort.natsorted(tf.io.gfile.glob(f'{directory}/*.{ext}'))
         for ext in _INPUT_EXT
