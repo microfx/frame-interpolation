@@ -136,7 +136,7 @@ def _output_frames(frames: List[np.ndarray], frames_dir: str):
   interpolated_frames = interpolator.interpolate_frames(frames)
 
   # Append the first frame to the end of the interpolated frames list
-  interpolated_frames.append(interpolated_frames[0])
+  #interpolated_frames.append(interpolated_frames[0])
 
   if tf.io.gfile.isdir(frames_dir):
     old_frames = tf.io.gfile.glob(f'{frames_dir}/frame_*.png')
@@ -164,8 +164,6 @@ class ProcessDirectory(beam.DoFn):
       media.set_ffmpeg(ffmpeg_path)
   
   def process(self, directory: str):
-    
-    
     input_frames_list = [
         natsort.natsorted(tf.io.gfile.glob(f'{directory}/*.{ext}'))
         for ext in _INPUT_EXT
@@ -174,7 +172,8 @@ class ProcessDirectory(beam.DoFn):
     if not input_frames_list or not all(input_frames_list):
         raise ValueError(f'No files found at directory {directory}')
     # Append the first frame of the first list to the end of the input_frames_list
-    input_frames_list[0].append(input_frames_list[0][0])
+    if input_frames_list[0]:
+      input_frames_list[0].append(input_frames_list[0][0])
     print(input_frames_list)
     input_frames = functools.reduce(lambda x, y: x + y, input_frames_list)
     logging.info('Generating in-between frames for %s.', directory)
