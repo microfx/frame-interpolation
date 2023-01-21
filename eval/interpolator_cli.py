@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC THANKS! 3
+# Copyright 2022 Google LLC THANKS! 4
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -164,11 +164,15 @@ class ProcessDirectory(beam.DoFn):
       media.set_ffmpeg(ffmpeg_path)
   
   def process(self, directory: str):
+    
+    
     input_frames_list = [
         natsort.natsorted(tf.io.gfile.glob(f'{directory}/*.{ext}'))
         for ext in _INPUT_EXT
     ]
     print(input_frames_list)
+    if not input_frames_list or not all(input_frames_list):
+        raise ValueError(f'No files found at directory {directory}')
     # Append the first frame of the first list to the end of the input_frames_list
     input_frames_list[0].append(input_frames_list[0][0])
     print(input_frames_list)
