@@ -123,18 +123,17 @@ _OUTPUT_VIDEO = flags.DEFINE_boolean(
 # Add other extensions, if not either.
 _INPUT_EXT = ['png', 'jpg', 'jpeg']
 
-
 def _output_frames(frames: List[np.ndarray], frames_dir: str):
   """Writes PNG-images to a directory.
-
   If frames_dir doesn't exist, it is created. If frames_dir contains existing
   PNG-files, they are removed before saving the new ones.
-
   Args:
     frames: List of images to save.
     frames_dir: The output directory to save the images.
-
   """
+  # Add the first frame to the end of the frames list
+  frames.append(frames[0])
+
   if tf.io.gfile.isdir(frames_dir):
     old_frames = tf.io.gfile.glob(f'{frames_dir}/frame_*.png')
     if old_frames:
@@ -147,7 +146,6 @@ def _output_frames(frames: List[np.ndarray], frames_dir: str):
       enumerate(frames), total=len(frames), ncols=100, colour='green'):
     util.write_image(f'{frames_dir}/frame_{idx:03d}.png', frame)
   logging.info('Output frames saved in %s.', frames_dir)
-
 
 class ProcessDirectory(beam.DoFn):
   """DoFn for running the interpolator on a single directory at the time."""
