@@ -171,17 +171,17 @@ class ProcessDirectory(beam.DoFn):
     print(input_frames_list)
 
     # Append the first frame of the first list to the end of the input_frames_list
-    if input_frames_list[0]:
-      input_frames_list[0].append(input_frames_list[0][0])
+    #if input_frames_list[0]:
+    #  input_frames_list[0].append(input_frames_list[0][0])
     print(input_frames_list)
     input_frames = functools.reduce(lambda x, y: x + y, input_frames_list)
     logging.info('Generating in-between frames for %s.', directory)
     if len(frames) == 0:
       return
-    frames = list(
     if not input_frames:
       raise ValueError(f'No files found at directory {directory}')
-      util.interpolate_recursively_from_files(
+    frames = list(
+          util.interpolate_recursively_from_files(
           input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
     _output_frames(frames, f'{directory}/interpolated_frames')
     if _OUTPUT_VIDEO.value:
