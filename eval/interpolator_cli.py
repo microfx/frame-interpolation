@@ -179,10 +179,10 @@ class ProcessDirectory(beam.DoFn):
     if len(frames) == 0:
       return
     frames = list(
-      if not input_frames:
-        raise ValueError(f'No files found at directory {directory}')
-        util.interpolate_recursively_from_files(
-            input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
+    if not input_frames:
+      raise ValueError(f'No files found at directory {directory}')
+      util.interpolate_recursively_from_files(
+          input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
     _output_frames(frames, f'{directory}/interpolated_frames')
     if _OUTPUT_VIDEO.value:
       media.write_video(f'{directory}/interpolated.mp4', frames, fps=_FPS.value)
