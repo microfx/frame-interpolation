@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-r"""Runs the FILM frame interpolator on a pair of frames on beam.
+"""Runs the FILM frame interpolator on a pair of frames on beam.
 
 This script is used evaluate the output quality of the FILM Tensorflow frame
 interpolator. Optionally, it outputs a video of the interpolated frames.
