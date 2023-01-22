@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2022 Google LLC THANKS! 5
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-r"""Runs the FILM frame interpolator on a pair of frames on beam.
+"""Runs the FILM frame interpolator on a pair of frames on beam.
 
 This script is used evaluate the output quality of the FILM Tensorflow frame
 interpolator. Optionally, it outputs a video of the interpolated frames.
@@ -123,18 +123,21 @@ _OUTPUT_VIDEO = flags.DEFINE_boolean(
 # Add other extensions, if not either.
 _INPUT_EXT = ['png', 'jpg', 'jpeg']
 
-
 def _output_frames(frames: List[np.ndarray], frames_dir: str):
   """Writes PNG-images to a directory.
-
   If frames_dir doesn't exist, it is created. If frames_dir contains existing
   PNG-files, they are removed before saving the new ones.
-
   Args:
     frames: List of images to save.
     frames_dir: The output directory to save the images.
-
   """
+
+  # Interpolate the frames
+  interpolated_frames = interpolator.interpolate_frames(frames)
+
+  # Append the first frame to the end of the interpolated frames list
+  #interpolated_frames.append(interpolated_frames[0])
+
   if tf.io.gfile.isdir(frames_dir):
     old_frames = tf.io.gfile.glob(f'{frames_dir}/frame_*.png')
     if old_frames:
@@ -144,11 +147,10 @@ def _output_frames(frames: List[np.ndarray], frames_dir: str):
   else:
     tf.io.gfile.makedirs(frames_dir)
   for idx, frame in tqdm(
-      enumerate(frames), total=len(frames), ncols=100, colour='green'):
+      enumerate(interpolated_frames), total=len(interpolated_frames), ncols=100, colour='green'):
     util.write_image(f'{frames_dir}/frame_{idx:03d}.png', frame)
   logging.info('Output frames saved in %s.', frames_dir)
-
-
+  
 class ProcessDirectory(beam.DoFn):
   """DoFn for running the interpolator on a single directory at the time."""
 
@@ -160,15 +162,25 @@ class ProcessDirectory(beam.DoFn):
     if _OUTPUT_VIDEO.value:
       ffmpeg_path = util.get_ffmpeg_path()
       media.set_ffmpeg(ffmpeg_path)
-
+  
   def process(self, directory: str):
     input_frames_list = [
         natsort.natsorted(tf.io.gfile.glob(f'{directory}/*.{ext}'))
         for ext in _INPUT_EXT
     ]
+    print(input_frames_list)
+
+    # Append the first frame of the first list to the end of the input_frames_list
+    if input_frames_list[0]:
+      input_frames_list[0].append(input_frames_list[0][0])
+    print(input_frames_list)
     input_frames = functools.reduce(lambda x, y: x + y, input_frames_list)
     logging.info('Generating in-between frames for %s.', directory)
+    if len(frames) == 0:
+      return
     frames = list(
+      if not input_frames:
+        raise ValueError(f'No files found at directory {directory}')
         util.interpolate_recursively_from_files(
             input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
     _output_frames(frames, f'{directory}/interpolated_frames')
