@@ -162,33 +162,25 @@ class ProcessDirectory(beam.DoFn):
     if _OUTPUT_VIDEO.value:
       ffmpeg_path = util.get_ffmpeg_path()
       media.set_ffmpeg(ffmpeg_path)
-  
+ 
+
   def process(self, directory: str):
     input_frames_list = [
         natsort.natsorted(tf.io.gfile.glob(f'{directory}/*.{ext}'))
         for ext in _INPUT_EXT
     ]
-    print(input_frames_list)
-
-    # Append the first frame of the first list to the end of the input_frames_list
-    #if input_frames_list[0]:
-    #  input_frames_list[0].append(input_frames_list[0][0])
-    print(input_frames_list)
+    print(input_frames_list)    
     input_frames = functools.reduce(lambda x, y: x + y, input_frames_list)
     logging.info('Generating in-between frames for %s.', directory)
-    if not input_frames:
-      raise ValueError(f'No files found at directory {directory}')
-    if len(frames) == 0:
-      return
     frames = list(
-          util.interpolate_recursively_from_files(
-          input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
+        util.interpolate_recursively_from_files(
+            input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
     _output_frames(frames, f'{directory}/interpolated_frames')
     if _OUTPUT_VIDEO.value:
       media.write_video(f'{directory}/interpolated.mp4', frames, fps=_FPS.value)
       logging.info('Output video saved at %s/interpolated.mp4.', directory)
 
-
+      
 def _run_pipeline() -> None:
   directories = tf.io.gfile.glob(_PATTERN.value)
   pipeline = beam.Pipeline('DirectRunner')
