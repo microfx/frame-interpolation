@@ -176,10 +176,10 @@ class ProcessDirectory(beam.DoFn):
     print(input_frames_list)
     input_frames = functools.reduce(lambda x, y: x + y, input_frames_list)
     logging.info('Generating in-between frames for %s.', directory)
-    if len(frames) == 0:
-      return
     if not input_frames:
       raise ValueError(f'No files found at directory {directory}')
+    if len(frames) == 0:
+      return
     frames = list(
           util.interpolate_recursively_from_files(
           input_frames, _TIMES_TO_INTERPOLATE.value, self.interpolator))
